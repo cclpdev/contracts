@@ -1,0 +1,12 @@
+LZeroBridge.log
+node_modules/**
+
+cache/**
+artifacts/**
+openzeppelin/**
+deployments/**
+docs/**
+test/**
+
+.idea/**
+
