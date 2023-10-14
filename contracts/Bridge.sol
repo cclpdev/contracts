@@ -60,9 +60,9 @@ contract Bridge is ILayerZeroReceiver, ILayerZeroUserApplicationConfig, Reentran
         lending = ILending(_lending);
     }
 
-//    receive() external payable {
+    receive() external payable {
 //        assert(msg.sender == address(weth)); // only accept ETH via fallback from the WETH contract
-//    }
+    }
 
     //---------------------------------------------------------------------------
     // EXTERNAL functions
@@ -142,6 +142,7 @@ contract Bridge is ILayerZeroReceiver, ILayerZeroUserApplicationConfig, Reentran
         require(_recoveryAddress(to) != address(0x0), "to can not be 0x0");
         // check bridge map
         require(bridgeTokenMap[toChainId][currentTokenAddr].length != 0, "need register token");
+        require(msg.value > 0, "must provide value");
         _callSend(msg.value, toChainId, TypeBridgeBurrow, adapterParams, abi.encode(TypeBridgeBurrow, to, bridgeTokenMap[toChainId][currentTokenAddr], amount, _getNextNonce()));
     }
 
@@ -192,7 +193,7 @@ contract Bridge is ILayerZeroReceiver, ILayerZeroUserApplicationConfig, Reentran
 
     function _callSend(uint256 leftBalance, uint16 toChainId, uint8 actionType, LzTxObj memory lzTxParams, bytes memory payload) internal  {
         bytes memory lzTxParamBuilt = _txParamBuilder(toChainId, actionType, lzTxParams);
-        layerZeroEndpoint.send{value: leftBalance}(toChainId, bridgeLookup[toChainId], payload, payable(msg.sender), address(this), lzTxParamBuilt);
+        layerZeroEndpoint.send{value: leftBalance}(toChainId, bridgeLookup[toChainId], payload, payable(address(this)), address(this), lzTxParamBuilt);
         emit SendMsg(actionType, layerZeroEndpoint.getOutboundNonce(toChainId, address(this)) + 1);
     }
 
@@ -200,7 +201,7 @@ contract Bridge is ILayerZeroReceiver, ILayerZeroUserApplicationConfig, Reentran
     // DAO config set
     function registerTokenMap(uint16 toChainId, address currentTokenAddress, bytes memory targetTokenBytes) external onlyOwner {
         // TODO
-        require(bridgeTokenMap[toChainId][currentTokenAddress].length == 0, "had register");
+//        require(bridgeTokenMap[toChainId][currentTokenAddress].length == 0, "had register");
         bridgeTokenMap[toChainId][currentTokenAddress] = targetTokenBytes;
     }
 
