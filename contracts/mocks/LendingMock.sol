@@ -8,6 +8,18 @@ pragma abicoder v2;
 
 contract LendingMock is ILending {
     IBridge public bridge;
+    // totalSupplied[tokenAddr] = amount
+    mapping(address => uint256) public totalSupplied;
+    // totalBurrowed[tokenAddr] = amount
+    mapping(address => uint256) public totalBurrowed;
+    // userSupplied[tokenAddr][userAddr] = amount
+    mapping(address => mapping(address => uint256)) public userSupplied;
+    // userBurrowed[tokenAddr][userAddr] = amount
+    mapping(address => mapping(address => uint256)) public userBurrowed;
+    // supplyApy[tokenAddr] = apy, real apy = apy / 1000000
+    mapping(address => uint256) public supplyApy;
+    // burrowApy[tokenAddr] = apy, real apy = apy / 1000000
+    mapping(address => uint256) public burrowApy;
     constructor(uint256 test) {
     }
 
@@ -17,6 +29,14 @@ contract LendingMock is ILending {
 
     function repay(uint16 toChainId, bytes memory to, address currentTokenAddr, uint256 amount) payable external {
         bridge.bridgeRepay(toChainId, to, currentTokenAddr, amount);
+    }
+
+    function withdraw(address currentTokenAddr, uint256 amount) external {
+
+    }
+
+    function supply(address currentTokenAddr, uint256 amount) external {
+
     }
 
     function toBurrow(uint16 srcChainId, bytes memory to, bytes memory token, uint256 amount) external returns(bool) {
